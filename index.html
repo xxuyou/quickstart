@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>DEMO</title>
+    <script src="https://cdn.bootcss.com/socket.io/2.0.3/socket.io.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/2.2.2/jquery.min.js"></script>
+    <script src="/static/js/wss.class.js?version=3.4.6"></script>
+    <script>
+        $(function () {
+            /**
+             * 连接参数，所有属性均为必填项
+             */
+            var config = {
+                "debug": true,
+                "info":  document.getElementById('result'),
+                "url":   'https://xxuyou.com',   // wss 服务器 url
+                "app":   'demo_app',   // 自己创建的 app name，用于域权限验证
+                "jwt":   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3c3MiOiJodHRwczovL3h4dXlvdS5jb20iLCJhcHAiOiJkZW1vX2FwcCIsInVpZCI6Inp6S0hRcERJZmRXZGsyRzhqM3lWVTF2YndfVnhydHFBIiwiZXhwaXJlcyI6MTUzMDA2MTQzNC44NCwiaWF0IjoxNDk4OTU3NDM0LCJleHAiOjE0OTk1NjIyMzR9.6HYz6RSPDi0xGqxgJCjWfPnIRNvx0m-gbNlgx1H7r9o', // 使用 JWT 制作的用户令牌，用于用户身份验证
+                "listener": []  // 待注册的监听事件，数组内放置多个监听函数
+            };
+            // 注册监听函数，可以注册多个
+            config['listener'].push({
+                "event":    "words:update",
+                "callback": function (res) {
+                    console.log('[CLIENT][INFO] 注册监听事件 receive [words:update]:', res);
+                    $('#result').prepend('<div class="text-success">['+res['time']+']'+res['words']+'</div>');
+                }
+            });
+            // 初始化 wss 实例
+            var initWssServ = function (config) {
+                var _wss = false;
+                if (!WSS) {
+                    console.log('[CLIENT][ERR] WSS is not defined');
+                    alert('WSS is not defined');
+                    return false;
+                };
+                try {
+                    _wss = new WSS(config);
+                } catch(e) {
+                    console.log('[CLIENT][ERR] e', e);
+                    alert(e.message);
+                    return false;
+                };
+                return _wss.instance;
+            };
+            var _wss = initWssServ(config);
+            if (_wss) {
+            } else {
+                throw new Error("[CLIENT][ERR]错误：连接 WSS 服务器失败！请刷新页面重新尝试！");
+            };
+        });
+    </script>
+</head>
+<body>
+<h1>DEMO</h1>
+<div id="result"></div>
+</body>
+</html>
